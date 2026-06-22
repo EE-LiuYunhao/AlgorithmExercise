@@ -6,7 +6,7 @@ use crate::data_structure::DataStructure;
 pub trait Algorithm {
     fn name(&self) -> &'static str;
     fn description(&self) -> &'static str;
-    fn run(&self, input: &DataStructure) -> Result<String, AlgorithmError>;
+    fn run(&self, input: &DataStructure) -> Result<DataStructure, AlgorithmError>;
 }
 
 pub trait Parser {
@@ -99,6 +99,7 @@ impl AlgorithmError {
         }
     }
 
+    #[allow(dead_code)]
     pub fn not_implemented(name: &str) -> Self {
         Self::new(format!("algorithm `{name}` is registered but not implemented yet"))
     }

@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter};
+
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DataStructure {
@@ -13,18 +15,25 @@ impl DataStructure {
             Self::StringArray(_) => "string-array",
         }
     }
+}
 
-    pub fn as_raw_string(&self) -> Option<&str> {
+impl Display for DataStructure {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::RawString(value) => Some(value.as_str()),
-            Self::StringArray(_) => None,
-        }
-    }
+            Self::RawString(raw_string) => write!(f, "{raw_string}"),
+            Self::StringArray(strings) => {
+                write!(f, "[")?;
 
-    pub fn as_string_array(&self) -> Option<&[String]> {
-        match self {
-            Self::RawString(_) => None,
-            Self::StringArray(values) => Some(values.as_slice()),
+                for (index, value) in strings.iter().enumerate() {
+                    if index > 0 {
+                        write!(f, ", ")?;
+                    }
+
+                    write!(f, "\"{value}\"")?;
+                }
+
+                write!(f, "]")
+            }
         }
     }
 }
@@ -38,8 +47,11 @@ mod tests {
         let value = DataStructure::RawString("hello".to_string());
 
         assert_eq!(value.kind(), "raw-string");
-        assert_eq!(value.as_raw_string(), Some("hello"));
-        assert_eq!(value.as_string_array(), None);
+
+        let DataStructure::RawString(raw_string) = value else {
+            panic!("expected raw-string");
+        };
+        assert_eq!(raw_string, "hello");
     }
 
     #[test]
@@ -47,10 +59,23 @@ mod tests {
         let value = DataStructure::StringArray(vec!["cat".to_string(), "car".to_string()]);
 
         assert_eq!(value.kind(), "string-array");
-        assert_eq!(value.as_raw_string(), None);
-        assert_eq!(
-            value.as_string_array(),
-            Some(vec!["cat".to_string(), "car".to_string()].as_slice())
-        );
+        let DataStructure::StringArray(strings) = value else {
+            panic!("expected string array");
+        };
+        assert_eq!(strings, vec!["cat".to_string(), "car".to_string()]);
+    }
+
+    #[test]
+    fn displays_raw_string_without_extra_wrapping() {
+        let value = DataStructure::RawString("hello".to_string());
+
+        assert_eq!(value.to_string(), "hello");
+    }
+
+    #[test]
+    fn displays_string_array_as_quoted_items() {
+        let value = DataStructure::StringArray(vec!["1".to_string(), "2".to_string()]);
+
+        assert_eq!(value.to_string(), "[\"1\", \"2\"]");
     }
 }

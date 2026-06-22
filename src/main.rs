@@ -7,7 +7,7 @@ use std::io::Read;
 use std::process;
 
 use clap::{ArgAction, CommandFactory, Parser as ClapParser};
-use contracts::AppError;
+use contracts::{AppError, ParseError};
 use data_structure::DataStructure;
 
 const AFTER_HELP: &str = "Examples:\n  cargo run -- tire --parser string-array --input '[\"data\", \"bus\", \"cat\", \"car\"]'\n  echo '[\"data\", \"bus\"]' | cargo run -- tire --parser string-array\n  echo 'hello world' | cargo run -- some-algorithm --parser raw-string";
@@ -130,7 +130,16 @@ fn parse_input(parser_name: Option<&str>, raw_input: &str) -> Result<DataStructu
                 io::create_parser(name).ok_or_else(|| AppError::UnknownParser(name.to_string()))?;
             Ok(parser.parse(raw_input)?)
         }
-        None => Ok(DataStructure::RawString(raw_input.to_string())),
+        None => {
+            // Try all parsers, and return the first success
+            for parser in io::available_parsers() {
+                if let Ok(parsed) = parser.parse(raw_input) {
+                    return Ok(parsed);
+                }
+            }
+            // If all failed, use RawStringParser as default.
+            Err(AppError::Parse(ParseError::new("no parser is specified, try everyone but no parser gets success")))
+        }
     }
 }
 
