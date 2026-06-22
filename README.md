@@ -23,6 +23,7 @@ Rust command-line project for running named algorithm implementations with plugg
 cargo run -- --list-algorithms
 cargo run -- --list-parsers
 cargo run -- tire --parser string-array --input '["data", "bus", "cat", "car"]'
+cargo run -- --verbose tire --parser string-array --input '["data", "bus"]'
 echo '["data", "bus", "cat", "car"]' | cargo run -- tire --parser string-array
 ```
 

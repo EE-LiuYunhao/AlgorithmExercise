@@ -2,6 +2,7 @@ use std::collections::{hash_map::Entry, HashMap};
 
 use crate::contracts::{Algorithm, AlgorithmError};
 use crate::data_structure::DataStructure;
+use crate::debug::DebugPrinter;
 
 pub struct TireAlgorithm;
 
@@ -24,7 +25,11 @@ impl Algorithm for TireAlgorithm {
         )
     }
 
-    fn run(&self, _input: &DataStructure) -> Result<DataStructure, AlgorithmError> {
+    fn run(
+        &self,
+        _input: &DataStructure,
+        debug: &DebugPrinter,
+    ) -> Result<DataStructure, AlgorithmError> {
         let DataStructure::StringArray(strings) = _input else {
             return Err(AlgorithmError::invalid_input("string array", _input));
         };
@@ -43,10 +48,10 @@ impl Algorithm for TireAlgorithm {
                 head = match head.children.entry(c) {
                     Entry::Occupied(entry) => entry.into_mut(),
                     Entry::Vacant(entry) => {
-                        println!(
-                            "[DEBUG] creating trie node for char {:?} in word {:?} with encode {}",
+                        debug.print(format!(
+                            "creating trie node for char {:?} in word {:?} with encode {}",
                             c, word, next_encode
-                        );
+                        ));
                         entry.insert(TrieNode {
                             encode: next_encode,
                             children: HashMap::new(),
@@ -58,10 +63,10 @@ impl Algorithm for TireAlgorithm {
             match head.children.entry('\0') {
                 Entry::Occupied(_) => {}
                 Entry::Vacant(entry) => {
-                    println!(
-                        "[DEBUG] creating trie leaf for word {:?} with encode {}",
+                    debug.print(format!(
+                        "creating trie leaf for word {:?} with encode {}",
                         word, leaf_encode
-                    );
+                    ));
                     entry.insert(TrieNode {
                         encode: leaf_encode,
                         children: HashMap::new(),

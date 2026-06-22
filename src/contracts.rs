@@ -2,11 +2,16 @@ use std::error::Error;
 use std::fmt::{Display, Formatter};
 
 use crate::data_structure::DataStructure;
+use crate::debug::DebugPrinter;
 
 pub trait Algorithm {
     fn name(&self) -> &'static str;
     fn description(&self) -> &'static str;
-    fn run(&self, input: &DataStructure) -> Result<DataStructure, AlgorithmError>;
+    fn run(
+        &self,
+        input: &DataStructure,
+        debug: &DebugPrinter,
+    ) -> Result<DataStructure, AlgorithmError>;
 }
 
 pub trait Parser {
@@ -74,6 +79,7 @@ impl ParseError {
         }
     }
 
+    #[allow(dead_code)]
     pub fn not_implemented(name: &str) -> Self {
         Self::new(format!("parser `{name}` is registered but not implemented yet"))
     }

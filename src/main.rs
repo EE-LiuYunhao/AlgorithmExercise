@@ -1,6 +1,7 @@
 mod algorithms;
 mod contracts;
 mod data_structure;
+mod debug;
 mod io;
 
 use std::io::Read;
@@ -9,8 +10,9 @@ use std::process;
 use clap::{ArgAction, CommandFactory, Parser as ClapParser};
 use contracts::{AppError, ParseError};
 use data_structure::DataStructure;
+use debug::DebugPrinter;
 
-const AFTER_HELP: &str = "Examples:\n  cargo run -- tire --parser string-array --input '[\"data\", \"bus\", \"cat\", \"car\"]'\n  echo '[\"data\", \"bus\"]' | cargo run -- tire --parser string-array\n  echo 'hello world' | cargo run -- some-algorithm --parser raw-string";
+const AFTER_HELP: &str = "Examples:\n  cargo run -- tire --parser string-array --input '[\"data\", \"bus\", \"cat\", \"car\"]'\n  cargo run -- --verbose tire --parser string-array --input '[\"data\", \"bus\"]'\n  echo 'hello world' | cargo run -- some-algorithm --parser raw-string";
 
 #[derive(Debug, ClapParser)]
 #[command(
@@ -54,6 +56,14 @@ struct Cli {
         help = "List registered parsers and exit."
     )]
     list_parsers: bool,
+
+    #[arg(
+        short = 'v',
+        long = "verbose",
+        action = ArgAction::SetTrue,
+        help = "Enable debug logging."
+    )]
+    verbose: bool,
 }
 
 fn main() {
@@ -65,6 +75,7 @@ fn main() {
 
 fn run() -> Result<(), AppError> {
     let cli = Cli::parse();
+    let debug = DebugPrinter::new(cli.verbose);
 
     if cli.list_algorithms {
         print_algorithms();
@@ -89,7 +100,7 @@ fn run() -> Result<(), AppError> {
 
     let raw_input = read_raw_input(cli.input)?;
     let structured_input = parse_input(cli.parser.as_deref(), &raw_input)?;
-    let output = algorithm.run(&structured_input)?;
+    let output = algorithm.run(&structured_input, &debug)?;
 
     println!("{output}");
 
@@ -163,6 +174,15 @@ mod tests {
         assert_eq!(cli.algorithm_name.as_deref(), Some("tire"));
         assert_eq!(cli.parser.as_deref(), Some("string-array"));
         assert_eq!(cli.input.as_deref(), Some("[\"data\"]"));
+        assert!(!cli.verbose);
+    }
+
+    #[test]
+    fn parses_verbose_flag() {
+        let cli = Cli::parse_from(["algorithm-cheatsheet", "-v", "tire"]);
+
+        assert!(cli.verbose);
+        assert_eq!(cli.algorithm_name.as_deref(), Some("tire"));
     }
 
     #[test]
