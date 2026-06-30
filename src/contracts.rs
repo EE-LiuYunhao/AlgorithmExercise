@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::fmt::{Display, Formatter};
+use std::num::ParseIntError;
 
 use crate::data_structure::DataStructure;
 use crate::debug::DebugPrinter;
@@ -48,6 +49,12 @@ impl Display for AppError {
 }
 
 impl Error for AppError {}
+
+impl From<ParseIntError> for ParseError {
+    fn from(value: ParseIntError) -> Self {
+        Self::new(format!("cannot parse string to int_32, due to error: {:?}", value))
+    }
+}
 
 impl From<std::io::Error> for AppError {
     fn from(value: std::io::Error) -> Self {

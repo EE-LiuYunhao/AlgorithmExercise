@@ -1,10 +1,13 @@
 use std::fmt::{Display, Formatter};
 
+pub(crate) mod graph;
+
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DataStructure {
     RawString(String),
     StringArray(Vec<String>),
+    Graph(Vec<graph::NodeRef>),
 }
 
 #[allow(dead_code)]
@@ -13,6 +16,7 @@ impl DataStructure {
         match self {
             Self::RawString(_) => "raw-string",
             Self::StringArray(_) => "string-array",
+            Self::Graph(_) => "graph",
         }
     }
 }
@@ -33,7 +37,8 @@ impl Display for DataStructure {
                 }
 
                 write!(f, "]")
-            }
+            },
+            Self::Graph(nodes, ) => graph::display_graph(f, nodes),
         }
     }
 }
