@@ -149,7 +149,9 @@ fn parse_input(parser_name: Option<&str>, raw_input: &str) -> Result<DataStructu
                 }
             }
             // If all failed, use RawStringParser as default.
-            Err(AppError::Parse(ParseError::new("no parser is specified, try everyone but no parser gets success")))
+            Err(AppError::Parse(ParseError::new(
+                "no parser is specified, try everyone but no parser gets success",
+            )))
         }
     }
 }

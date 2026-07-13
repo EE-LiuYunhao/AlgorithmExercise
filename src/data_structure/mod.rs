@@ -1,13 +1,19 @@
 use std::fmt::{Display, Formatter};
 
 pub(crate) mod graph;
+pub(crate) mod linked_list;
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DataStructure {
     RawString(String),
+    Int(i32),
+    IntArray(Vec<i32>),
     StringArray(Vec<String>),
     Graph(Vec<graph::NodeRef>),
+    LinkedListInt(linked_list::NodeRef<i32>),
+    LinkedListString(linked_list::NodeRef<String>),
+    LinkedListFloat(linked_list::NodeRef<f32>),
 }
 
 #[allow(dead_code)]
@@ -15,8 +21,13 @@ impl DataStructure {
     pub fn kind(&self) -> &'static str {
         match self {
             Self::RawString(_) => "raw-string",
+            Self::Int(_) => "int",
+            Self::IntArray(_) => "int-array",
             Self::StringArray(_) => "string-array",
             Self::Graph(_) => "graph",
+            Self::LinkedListInt(_) => "linked-list(int32)",
+            Self::LinkedListFloat(_) => "linked-list(float32)",
+            Self::LinkedListString(_) => "linked-list(string)",
         }
     }
 }
@@ -25,6 +36,19 @@ impl Display for DataStructure {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::RawString(raw_string) => write!(f, "{raw_string}"),
+            Self::Int(i) => write!(f, "{i}"),
+            Self::IntArray(ints) => {
+                write!(f, "[")?;
+                for (index, value) in ints.iter().enumerate() {
+                    if index > 0 {
+                        write!(f, ", ")?;
+                    }
+
+                    write!(f, "\"{value}\"")?;
+                }
+
+                write!(f, "]")
+            }
             Self::StringArray(strings) => {
                 write!(f, "[")?;
 
@@ -37,8 +61,11 @@ impl Display for DataStructure {
                 }
 
                 write!(f, "]")
-            },
-            Self::Graph(nodes, ) => graph::display_graph(f, nodes),
+            }
+            Self::Graph(nodes) => graph::display_graph(f, nodes),
+            Self::LinkedListInt(head) => linked_list::display::<i32>(f, head),
+            Self::LinkedListFloat(head) => linked_list::display::<f32>(f, head),
+            Self::LinkedListString(head) => linked_list::display::<String>(f, head),
         }
     }
 }
@@ -46,6 +73,13 @@ impl Display for DataStructure {
 #[cfg(test)]
 mod tests {
     use super::DataStructure;
+
+    fn assert_eq_impl<T: Eq>() {}
+
+    #[test]
+    fn data_structure_implements_eq_with_linked_list_float_variant_present() {
+        assert_eq_impl::<DataStructure>();
+    }
 
     #[test]
     fn exposes_raw_string_helpers() {

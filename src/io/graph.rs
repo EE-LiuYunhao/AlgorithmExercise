@@ -1,14 +1,17 @@
-use crate::{contracts::{ParseError, Parser}, data_structure::{graph, DataStructure}};
+use crate::{
+    contracts::{ParseError, Parser},
+    data_structure::{graph, DataStructure},
+};
 
 pub struct GraphParser;
 
 enum ScannerState {
-    NodeIds, // the first [ ... ], before the ]
+    NodeIds,                         // the first [ ... ], before the ]
     NodeIdsDone, // done with the first [ ... ], after the ] but before the next [
-    EdgeAwaitingParenthesis, // The second [ shows up, so awaiting the ( for the new edge. 
+    EdgeAwaitingParenthesis, // The second [ shows up, so awaiting the ( for the new edge.
     EdgeAwaitingComma, // processing the edge::from, awaiting the `,` to mark the edge::to
     EdgeAwaitingSecondComma(String), // edge::from's process is done, comma is met, string -> the edge::from, processing the edge_from
-    EdgeAwaitingCloseParenthesis(String, String), 
+    EdgeAwaitingCloseParenthesis(String, String),
     EdgeAwaitingCommaAfterParenthesis, // completed (FROM, TO) edge tuple, so waiting for the next comma, to start processing the next edge::to
 }
 
@@ -39,15 +42,11 @@ impl Parser for GraphParser {
         let mut scanner_state = ScannerState::NodeIds;
         match scanner.next() {
             Some('[') => {}
-            _ => {
-                return Err(ParseError::new(
-                    "graph input must start with `[`",
-                ))
-            }
+            _ => return Err(ParseError::new("graph input must start with `[`")),
         }
         let mut parse_buffer = Vec::<char>::new();
         let mut nodes = Vec::<graph::NodeRef>::new();
-        let add_node = |nodes: &mut Vec<graph::NodeRef>, buffer: &mut Vec::<char>| {
+        let add_node = |nodes: &mut Vec<graph::NodeRef>, buffer: &mut Vec<char>| {
             let node_id = buffer.iter().collect();
             let found = nodes.iter().find(|node| node.borrow().id == node_id);
             if found.is_some() {
@@ -62,18 +61,28 @@ impl Parser for GraphParser {
             if from == to && cost == 0 {
                 return Ok(()); // self-no-cost loop is okay, but omitted
             }
-            
+
             let from_node = nodes.iter().find(|node| node.borrow().id == from);
             let to_node = nodes.iter().find(|node| node.borrow().id == to);
 
             if from_node.is_none() {
-                return Err(ParseError::new(format!("Edge ({0}, {1}) is invalid because {0} is unknown", from, to)));
+                return Err(ParseError::new(format!(
+                    "Edge ({0}, {1}) is invalid because {0} is unknown",
+                    from, to
+                )));
             }
             if to_node.is_none() {
-                return Err(ParseError::new(format!("Edge ({0}, {1}) is invalid because {1} is unknown", from, to)));
+                return Err(ParseError::new(format!(
+                    "Edge ({0}, {1}) is invalid because {1} is unknown",
+                    from, to
+                )));
             }
 
-            from_node.unwrap().borrow_mut().children.push((to_node.unwrap().clone(), cost));
+            from_node
+                .unwrap()
+                .borrow_mut()
+                .children
+                .push((to_node.unwrap().clone(), cost));
             Ok(())
         };
 
@@ -160,9 +169,7 @@ mod tests {
 
     #[test]
     fn parses_node_names_with_spaces_and_matches_edges_without_spaces_bits_ut() {
-        let parsed = parse_to_string(
-            "[Node A, NodeB, Node C] [(NodeA, NodeB), (Node B, Node C)]",
-        );
+        let parsed = parse_to_string("[Node A, NodeB, Node C] [(NodeA, NodeB), (Node B, Node C)]");
 
         assert_eq!(
             parsed,
@@ -204,7 +211,10 @@ mod tests {
     fn keeps_duplicate_edges_without_panicking_bits_ut() {
         let parsed = parse_to_string("[NodeA, NodeB] [(NodeA, NodeB), (Node A, Node B)]");
 
-        assert_eq!(parsed, "[\n\tNodeA -> [NodeB(0), NodeB(0)],\n\tNodeB -> []]");
+        assert_eq!(
+            parsed,
+            "[\n\tNodeA -> [NodeB(0), NodeB(0)],\n\tNodeB -> []]"
+        );
     }
 
     #[test]
@@ -220,9 +230,7 @@ mod tests {
 
     #[test]
     fn supports_mixed_weighted_and_unweighted_edges_bits_ut() {
-        let parsed = parse_to_string(
-            "[NodeA, NodeB, NodeC] [(NodeA, NodeB), (NodeA, NodeC, 5)]",
-        );
+        let parsed = parse_to_string("[NodeA, NodeB, NodeC] [(NodeA, NodeB), (NodeA, NodeC, 5)]");
 
         assert_eq!(
             parsed,

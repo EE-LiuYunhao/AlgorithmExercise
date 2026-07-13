@@ -5,10 +5,7 @@ use std::{
 
 use crate::{
     contracts::{Algorithm, AlgorithmError},
-    data_structure::{
-        graph::NodeRef,
-        DataStructure,
-    },
+    data_structure::{graph::NodeRef, DataStructure},
 };
 
 pub struct DijkstraAlgorithm;
@@ -17,7 +14,7 @@ impl Algorithm for DijkstraAlgorithm {
     fn name(&self) -> &'static str {
         "dijkstra"
     }
-    
+
     fn description(&self) -> &'static str {
         concat!(
             "Dijkstra algorithm to search a graph from the first-declared node to ",
@@ -27,7 +24,7 @@ impl Algorithm for DijkstraAlgorithm {
             "node `a` to each node `b`, `c`, `d`, `e`, etc.."
         )
     }
-    
+
     fn run(
         &self,
         input: &DataStructure,
@@ -49,17 +46,17 @@ impl Algorithm for DijkstraAlgorithm {
         let mut distances = HashMap::<String, i32>::with_capacity(graph.len());
         let mut previous = HashMap::<String, String>::with_capacity(graph.len().saturating_sub(1));
         // Note: Dijkstra algorithm MUST use a previous array, instead of a SPT tree structure
-        //       directly. For example, a minimal path from Node A to Node C is Node A -> B -> C. 
-        //       Then in the previous node array, previous[B] is A, previous[C] is B. 
+        //       directly. For example, a minimal path from Node A to Node C is Node A -> B -> C.
+        //       Then in the previous node array, previous[B] is A, previous[C] is B.
         //       In the SPT tree, A's next is {B, }, and B's next is {C, }
         // The reason we must only use a previous in the iteration, and construct a SPT
-        //       tree only after the Dijkstra is completed, is this scenario: 
-        //       At first, minimal path from A to C is Node A -> B -> C. 
-        //       Then, we found the path A -> D -> C is shorter. 
+        //       tree only after the Dijkstra is completed, is this scenario:
+        //       At first, minimal path from A to C is Node A -> B -> C.
+        //       Then, we found the path A -> D -> C is shorter.
         //       If using previous array, simply previous[C] = D should work. But if
         //       using SPT structure, simply D.next.append(C) is not sufficiently,
         //       because B.next also contains C, so we should iterate over the entire tree
-        //       to find the current tree node pointing to C and remove it. 
+        //       to find the current tree node pointing to C and remove it.
         let mut node_lookup = HashMap::<String, NodeRef>::with_capacity(graph.len());
 
         for node in graph.iter() {
@@ -68,7 +65,7 @@ impl Algorithm for DijkstraAlgorithm {
             distances.insert(node_id, i32::MAX);
         }
         distances.insert(source_id.clone(), 0); // for the case if there a backloop from
-        // nodes to the source. 
+                                                // nodes to the source.
 
         let mut frontier = BinaryHeap::<(Reverse<i32>, String)>::new();
         frontier.push((Reverse(0), source_id.clone()));

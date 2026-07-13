@@ -73,24 +73,28 @@ impl Algorithm for TireAlgorithm {
                     });
                 }
             }
-        };
+        }
 
         for word in strings {
-            let mut head = & root;
+            let mut head = &root;
             let mut prefix = Vec::<u8>::new();
             for c in word.chars() {
                 let Some(child) = head.children.get(&c) else {
-                    return Err(AlgorithmError::new(format!("internal error: unexpected word {word} --- no char {c}")));
+                    return Err(AlgorithmError::new(format!(
+                        "internal error: unexpected word {word} --- no char {c}"
+                    )));
                 };
-                if head.children.len() != 1  {
+                if head.children.len() != 1 {
                     prefix.push(child.encode);
                 }
                 head = child;
             }
             let Some(leaf) = head.children.get(&'\0') else {
-                return Err(AlgorithmError::new(format!("internal error: unexpected word {word} --- not at a leaf node")));
+                return Err(AlgorithmError::new(format!(
+                    "internal error: unexpected word {word} --- not at a leaf node"
+                )));
             };
-            if head.children.len() != 1  {
+            if head.children.len() != 1 {
                 prefix.push(leaf.encode);
             }
             each_word_prefix.push(prefix.iter().map(|e| e.to_string()).collect());

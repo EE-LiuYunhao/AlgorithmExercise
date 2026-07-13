@@ -52,7 +52,10 @@ impl Error for AppError {}
 
 impl From<ParseIntError> for ParseError {
     fn from(value: ParseIntError) -> Self {
-        Self::new(format!("cannot parse string to int_32, due to error: {:?}", value))
+        Self::new(format!(
+            "cannot parse string to int_32, due to error: {:?}",
+            value
+        ))
     }
 }
 
@@ -88,7 +91,9 @@ impl ParseError {
 
     #[allow(dead_code)]
     pub fn not_implemented(name: &str) -> Self {
-        Self::new(format!("parser `{name}` is registered but not implemented yet"))
+        Self::new(format!(
+            "parser `{name}` is registered but not implemented yet"
+        ))
     }
 }
 
@@ -114,7 +119,9 @@ impl AlgorithmError {
 
     #[allow(dead_code)]
     pub fn not_implemented(name: &str) -> Self {
-        Self::new(format!("algorithm `{name}` is registered but not implemented yet"))
+        Self::new(format!(
+            "algorithm `{name}` is registered but not implemented yet"
+        ))
     }
 
     #[allow(dead_code)]

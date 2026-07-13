@@ -16,7 +16,9 @@ impl Parser for StringArrayParser {
         let raw_input = raw_input.trim();
 
         if !raw_input.starts_with('[') || !raw_input.ends_with(']') {
-            return Err(ParseError::new("input must be in format of [\"a\", \"b\", \"c\", ...]"));
+            return Err(ParseError::new(
+                "input must be in format of [\"a\", \"b\", \"c\", ...]",
+            ));
         }
 
         let inner = &raw_input[1..raw_input.len() - 1];
