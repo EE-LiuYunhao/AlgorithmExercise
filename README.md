@@ -5,7 +5,7 @@ Rust command-line project for running named algorithm implementations with plugg
 ## Purpose
 
 - dispatch algorithms by name with `cargo run -- [ALGORITHM-NAME]`
-- parse raw string input through reusable parser implementations in `src/io`
+- parse raw string input through reusable parser implementations in `src/parser`
 - share input data definitions through `src/data_structure`
 - keep algorithm contracts, parser contracts, and runtime wiring explicit and easy to extend
 
@@ -15,7 +15,7 @@ Rust command-line project for running named algorithm implementations with plugg
 - `src/contracts.rs` defines the shared `Algorithm` and `Parser` traits plus error types
 - `src/data_structure` defines the shared data enum passed from parsers to algorithms
 - `src/algorithms` contains registered algorithm implementations
-- `src/io` contains registered parser implementations
+- `src/parser` contains registered parser implementations
 
 ## Quick start
 

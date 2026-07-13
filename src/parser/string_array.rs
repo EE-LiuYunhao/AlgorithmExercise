@@ -1,7 +1,7 @@
 use crate::contracts::{ParseError, Parser};
 use crate::data_structure::DataStructure;
 
-pub struct StringArrayParser;
+pub(super) struct StringArrayParser;
 
 impl Parser for StringArrayParser {
     fn name(&self) -> &'static str {

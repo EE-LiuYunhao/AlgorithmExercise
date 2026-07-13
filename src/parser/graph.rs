@@ -3,7 +3,7 @@ use crate::{
     data_structure::{graph, DataStructure},
 };
 
-pub struct GraphParser;
+pub(super) struct GraphParser;
 
 enum ScannerState {
     NodeIds,                         // the first [ ... ], before the ]

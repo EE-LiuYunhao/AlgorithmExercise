@@ -5,7 +5,7 @@ use crate::{
     data_structure::DataStructure,
 };
 
-pub struct IntArrayParser;
+pub(super) struct IntArrayParser;
 
 impl Parser for IntArrayParser {
     fn name(&self) -> &'static str {

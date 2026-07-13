@@ -5,7 +5,11 @@ pub(crate) mod linked_list;
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum DataStructure {
+/// Shared payload type exchanged between parsers and algorithms.
+///
+/// Each variant represents one supported structured input or output shape used
+/// by the CLI runtime.
+pub(crate) enum DataStructure {
     RawString(String),
     Int(i32),
     IntArray(Vec<i32>),
@@ -18,6 +22,7 @@ pub enum DataStructure {
 
 #[allow(dead_code)]
 impl DataStructure {
+    /// Returns the stable kind name used in diagnostics and error messages.
     pub fn kind(&self) -> &'static str {
         match self {
             Self::RawString(_) => "raw-string",
@@ -62,7 +67,7 @@ impl Display for DataStructure {
 
                 write!(f, "]")
             }
-            Self::Graph(nodes) => graph::display_graph(f, nodes),
+            Self::Graph(nodes) => graph::display(f, nodes),
             Self::LinkedListInt(head) => linked_list::display::<i32>(f, head),
             Self::LinkedListFloat(head) => linked_list::display::<f32>(f, head),
             Self::LinkedListString(head) => linked_list::display::<String>(f, head),

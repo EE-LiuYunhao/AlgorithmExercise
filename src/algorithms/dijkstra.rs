@@ -8,7 +8,7 @@ use crate::{
     data_structure::{graph::NodeRef, DataStructure},
 };
 
-pub struct DijkstraAlgorithm;
+pub(super) struct DijkstraAlgorithm;
 
 impl Algorithm for DijkstraAlgorithm {
     fn name(&self) -> &'static str {

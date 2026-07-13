@@ -10,7 +10,7 @@ pub(crate) struct Node {
 
 pub(crate) type NodeRef = Rc<RefCell<Node>>;
 
-pub(crate) fn display_graph(f: &mut Formatter<'_>, nodes: &[NodeRef]) -> std::fmt::Result {
+pub(crate) fn display(f: &mut Formatter<'_>, nodes: &[NodeRef]) -> std::fmt::Result {
     write!(f, "[")?;
     for (index, value) in nodes.iter().enumerate() {
         let node = value.borrow();

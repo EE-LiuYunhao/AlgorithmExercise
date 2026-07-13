@@ -10,14 +10,14 @@ This repository is a Rust CLI for running algorithm implementations by name with
 - keep shared traits and cross-cutting errors in `src/contracts.rs`
 - keep shared algorithm/parser payloads in `src/data_structure`
 - keep algorithm implementations in `src/algorithms`
-- keep parser implementations in `src/io`
+- keep parser implementations in `src/parser`
 
 ## Runtime Contract
 
 - `cargo run -- [ALGORITHM-NAME]` selects an algorithm from `src/algorithms`
 - `cargo run -- [ALGORITHM-NAME] --input "..."` uses the provided raw input string
 - when `--input` is omitted, raw input must be read from STDIN
-- `cargo run -- [ALGORITHM-NAME] --parser [PARSER-NAME]` selects a parser from `src/io`
+- `cargo run -- [ALGORITHM-NAME] --parser [PARSER-NAME]` selects a parser from `src/parser`
 - parsers convert raw text into a shared `DataStructure` value before algorithm execution
 - algorithms and parsers must be registered in their module registries so the CLI can find them
 

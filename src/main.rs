@@ -2,7 +2,7 @@ mod algorithms;
 mod contracts;
 mod data_structure;
 mod debug;
-mod io;
+mod parser;
 
 use std::io::Read;
 use std::process;
@@ -39,7 +39,7 @@ struct Cli {
     #[arg(
         long,
         value_name = "PARSER-NAME",
-        help = "Parser to use from the io module before running the algorithm."
+        help = "Parser to use from the parser module before running the algorithm."
     )]
     parser: Option<String>,
 
@@ -118,7 +118,7 @@ fn print_algorithms() {
 fn print_parsers() {
     println!("Available parsers:");
 
-    for parser in io::available_parsers() {
+    for parser in parser::available_parsers() {
         println!("- {}: {}", parser.name(), parser.description());
     }
 }
@@ -137,13 +137,13 @@ fn read_raw_input(input: Option<String>) -> Result<String, AppError> {
 fn parse_input(parser_name: Option<&str>, raw_input: &str) -> Result<DataStructure, AppError> {
     match parser_name {
         Some(name) => {
-            let parser =
-                io::create_parser(name).ok_or_else(|| AppError::UnknownParser(name.to_string()))?;
+            let parser = parser::create_parser(name)
+                .ok_or_else(|| AppError::UnknownParser(name.to_string()))?;
             Ok(parser.parse(raw_input)?)
         }
         None => {
             // Try all parsers, and return the first success
-            for parser in io::available_parsers() {
+            for parser in parser::available_parsers() {
                 if let Ok(parsed) = parser.parse(raw_input) {
                     return Ok(parsed);
                 }

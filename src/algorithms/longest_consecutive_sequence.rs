@@ -9,7 +9,7 @@ use crate::{
     debug::DebugPrinter,
 };
 
-pub struct LongestConsecutiveSequence;
+pub(super) struct LongestConsecutiveSequence;
 
 impl Algorithm for LongestConsecutiveSequence {
     fn name(&self) -> &'static str {

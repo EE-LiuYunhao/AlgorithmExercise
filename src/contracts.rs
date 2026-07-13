@@ -5,9 +5,22 @@ use std::num::ParseIntError;
 use crate::data_structure::DataStructure;
 use crate::debug::DebugPrinter;
 
+/// Common interface for all registered algorithms.
+///
+/// Implementors expose a stable command-line name, a human-readable description,
+/// and the execution entry point that consumes a parsed [`DataStructure`].
 pub trait Algorithm {
+    /// Returns the stable registry name used by the CLI.
     fn name(&self) -> &'static str;
+
+    /// Returns a human-readable summary shown in help and listing output.
     fn description(&self) -> &'static str;
+
+    /// Executes the algorithm against an already parsed input payload.
+    ///
+    /// Implementations should validate that `input` has the expected shape and
+    /// return [`AlgorithmError`] when the payload kind is unsupported or the
+    /// algorithm-specific execution fails.
     fn run(
         &self,
         input: &DataStructure,
@@ -15,18 +28,37 @@ pub trait Algorithm {
     ) -> Result<DataStructure, AlgorithmError>;
 }
 
+/// Common interface for all registered input parsers.
+///
+/// Parsers convert raw user input into a shared [`DataStructure`] value so that
+/// algorithms can operate on typed payloads instead of plain text.
 pub trait Parser {
+    /// Returns the stable registry name used by the CLI.
     fn name(&self) -> &'static str;
+
+    /// Returns a human-readable summary shown in help and listing output.
     fn description(&self) -> &'static str;
+
+    /// Parses a raw input string into a structured payload.
     fn parse(&self, raw_input: &str) -> Result<DataStructure, ParseError>;
 }
 
+/// Top-level application error for CLI execution.
 #[derive(Debug)]
 pub enum AppError {
+    /// The user requested an algorithm name that is not registered.
     UnknownAlgorithm(String),
+
+    /// The user requested a parser name that is not registered.
     UnknownParser(String),
+
+    /// Reading input from stdin or other I/O sources failed.
     Io(std::io::Error),
+
+    /// Converting raw input into a structured payload failed.
     Parse(ParseError),
+
+    /// Running a selected algorithm failed.
     Algorithm(AlgorithmError),
 }
 
@@ -77,12 +109,14 @@ impl From<AlgorithmError> for AppError {
     }
 }
 
+/// Error returned when raw user input cannot be parsed into a [`DataStructure`].
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ParseError {
     message: String,
 }
 
 impl ParseError {
+    /// Creates a new parse error from any string-like message.
     pub fn new(message: impl Into<String>) -> Self {
         Self {
             message: message.into(),
@@ -90,6 +124,7 @@ impl ParseError {
     }
 
     #[allow(dead_code)]
+    /// Creates a standard error message for a parser that is registered but not implemented.
     pub fn not_implemented(name: &str) -> Self {
         Self::new(format!(
             "parser `{name}` is registered but not implemented yet"
@@ -105,12 +140,14 @@ impl Display for ParseError {
 
 impl Error for ParseError {}
 
+/// Error returned when an algorithm cannot be executed successfully.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AlgorithmError {
     message: String,
 }
 
 impl AlgorithmError {
+    /// Creates a new algorithm error from any string-like message.
     pub fn new(message: impl Into<String>) -> Self {
         Self {
             message: message.into(),
@@ -118,6 +155,7 @@ impl AlgorithmError {
     }
 
     #[allow(dead_code)]
+    /// Creates a standard error message for an algorithm that is registered but not implemented.
     pub fn not_implemented(name: &str) -> Self {
         Self::new(format!(
             "algorithm `{name}` is registered but not implemented yet"
@@ -125,6 +163,7 @@ impl AlgorithmError {
     }
 
     #[allow(dead_code)]
+    /// Creates an error describing a mismatch between expected and actual input kinds.
     pub fn invalid_input(expected: &str, actual: &DataStructure) -> Self {
         Self::new(format!(
             "algorithm expected {expected}, but received {}",

@@ -4,7 +4,7 @@ use crate::contracts::{Algorithm, AlgorithmError};
 use crate::data_structure::DataStructure;
 use crate::debug::DebugPrinter;
 
-pub struct TireAlgorithm;
+pub(crate) struct TireAlgorithm;
 
 struct TrieNode {
     encode: u8,
